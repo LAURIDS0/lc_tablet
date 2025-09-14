@@ -1,4 +1,4 @@
-document.getElementById('tabletBox').style.display = 'none';
+// document.getElementById('tabletBox').style.display = 'none'; // Initially hide the tablet
 
 window.addEventListener('message', function(event) {
     if (event.data.action === 'openTablet') {
