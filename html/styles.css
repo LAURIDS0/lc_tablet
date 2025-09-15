@@ -4,7 +4,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(to right, rgb(6, 6, 214), rgb(243, 0, 0));
+    background: linear-gradient(45deg, crimson, rgb(23, 172, 231));
     color: black;
     border: 25px solid #131313;
     width: 85%;
@@ -13,5 +13,59 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1rem; /* reduced so app labels don't scale too large */
+}
+
+#topBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5%; /* bigger so contents fit */
+    color: white;
+    background-color: rgba(62, 62, 62, 0.7);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 20px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+#battery {
+    font-size: 0.9rem;
+    background: green;
+    border: #131313 solid 1px;
+    border-radius: 5px;
+}
+
+#appGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr); /* 12 apps -> 4 columns x 3 rows */
+    gap: 24px;
+    width: 92%;
+    height: calc(100% - 12%); /* leave room for top bar + bottom button */
+    padding: 4% 4%;
+    place-items: center; /* center app icons in grid cells */
+}
+
+.appIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem; /* reasonable label size */
+    color: black;
+    user-select: none;
+    width: 100%;
+    height: 100%;
+}
+
+#buttomButton {
+    position: absolute;
+    bottom: 0.5%;
+    width: 20%;
+    height: 2%;
+    background: #3e3e3e;
+    border-radius: 9px;
 }
