@@ -32,5 +32,6 @@ optional_dependencies {
 files {
     'html/index.html',
     'html/styles.css',
-    'html/script.js'
+    'html/script.js',
+    'html/images/*.png'
 }

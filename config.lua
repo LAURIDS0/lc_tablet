@@ -4,15 +4,22 @@ Config.Apps = {
     {
         id = "maps",
         name = "Maps",
-        icon = "html/images/maps.png",
-        item = "lc_map_USB",
+        icon = "images/maps.png",
+        item = "lc_map_usb",
         export = "lc_map:client:openMapApp"
     },
     {
-        id = "race",
+        id = "racing",
         name = "Racing",
-        icon = "html/images/race.png",
-        item = "lc_raceing_USB",
-        export = "rahe-racing:client:openTablet"
+        icon = "images/race.png",
+        item = "lc_raceing_usb",
+        export = "lc_raceing:client:openRaceApp"
+    },
+    {
+        id = "browser",
+        name = "Browser",
+        icon = "images/browser.png",
+        item = "lc_browser_usb",
+        export = "lc_browser:client:openBrowserApp"
     },
 }

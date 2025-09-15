@@ -1,52 +1,79 @@
 RegisterNetEvent('lc_tablet:client:openSIM')
 AddEventHandler('lc_tablet:client:openSIM', function()
     exports.ox_inventory:displayMetadata({ tabletId = 'TabletID'})
-    print(json.encode({ tabletId = 'TabletID' }, { indent = true }))
+    local items = exports.ox_inventory:Search('slots', 'lc_tablet')
+    if items and #items > 0 then
+        exports.ox_inventory:closeInventory()
+        local tabletId = items[1].metadata.tabletId
+        TriggerServerEvent('lc_tablet:server:openTabletStash', tabletId)
+    else
+        lib.notify({
+            title = 'Tablet',
+            status = 'error',
+            description = 'You do not have a tablet in your inventory.'
+        })
+    end
+end)
+RegisterNetEvent('lc_tablet:client:openTabletStash')
+AddEventHandler('lc_tablet:client:openTabletStash', function(stashId, owner)
+    exports.ox_inventory:openInventory('stash', {id=stashId, owner=owner})
 end)
 
+local currentStashId = nil
+RegisterNetEvent('lc_tablet:client:openTabletStash')
+AddEventHandler('lc_tablet:client:openTabletStash', function(stashId, owner)
+    currentStashId = stashId
+    exports.ox_inventory:openInventory('stash', {id=stashId, owner=owner})
+end)
 
+-- Handle using the tablet item
 RegisterNetEvent('lc_tablet:client:useTablet')
 AddEventHandler('lc_tablet:client:useTablet', function()
-    SetNuiFocus(true, true)
-    SendNUIMessage({ action = 'openTablet' })
-    RequestAnimDict("amb@world_human_seat_wall_tablet@female@idle_a")
-    while not HasAnimDictLoaded("amb@world_human_seat_wall_tablet@female@idle_a") do
-        Wait(10)
-    end
-    local playerPed = PlayerPedId()
-    local chairHash = GetHashKey("prop_chair_01a")
-    local laptopHash = GetHashKey("prop_laptop_01a")
-
-    -- Find nearest chair
-    local coords = GetEntityCoords(playerPed)
-    local chair = nil
-    for _, obj in ipairs(GetGamePool('CObject')) do
-        if GetEntityModel(obj) == chairHash then
-            local objCoords = GetEntityCoords(obj)
-            if #(coords - objCoords) < 2.0 then
-                chair = obj
-                break
-            end
-        end
-    end
-
-    -- Sit player on chair if found
-    if chair then
-        TaskStartScenarioAtPosition(playerPed, "PROP_HUMAN_SEAT_CHAIR", GetEntityCoords(chair), GetEntityHeading(chair), 0, true, false)
+    local items = exports.ox_inventory:Search('slots', 'lc_tablet')
+    if items and #items > 0 then
+        exports.ox_inventory:closeInventory()
+        local tabletId = items[1].metadata.tabletId
+        TriggerServerEvent('lc_tablet:server:requestUSBApps', tabletId)
     else
-        TaskStartScenarioInPlace(playerPed, "PROP_HUMAN_SEAT_CHAIR", 0, true)
+        lib.notify({
+            title = 'Tablet',
+            status = 'error',
+            description = 'You do not have a tablet in your inventory.'
+        })
+        return
     end
-
-    -- Create and attach laptop prop
-    Wait(1000)
-    local laptop = CreateObject(laptopHash, coords.x, coords.y, coords.z, true, true, false)
-    AttachEntityToEntity(laptop, playerPed, GetPedBoneIndex(playerPed, 28422), 0.18, 0.02, 0.0, 0.0, 90.0, 0.0, true, true, false, true, 1, true)
 end)
 
+-- Handle receiving the available apps from the server and open the tablet UI
+RegisterNetEvent('lc_tablet:client:receiveUSBApps')
+AddEventHandler('lc_tablet:client:receiveUSBApps', function(availableApps)
+    SetNuiFocus(true, true)
+    local filteredApps = {}
+    for _, app in ipairs(availableApps) do
+        if app.data and app.data ~= 0 then
+            table.insert(filteredApps, app)
+        end
+    end
+    SendNUIMessage({ action = 'openTablet', apps = filteredApps })
+    local playerPed = PlayerPedId()
+    RequestAnimDict("amb@world_human_seat_wall_tablet@female@idle_a")
+    while not HasAnimDictLoaded("amb@world_human_seat_wall_tablet@female@idle_a") do Wait(10) end
+    TaskPlayAnim(playerPed, "amb@world_human_seat_wall_tablet@female@idle_a", "idle_a", 8.0, -8.0, -1, 49, 0, false, false, false)
+    Wait(50)
+    local tablet = CreateObject(GetHashKey("prop_cs_tablet"), table.unpack(GetEntityCoords(playerPed)), true, true, false)
+    AttachEntityToEntity(tablet, playerPed, GetPedBoneIndex(playerPed, 60309), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+end)
+
+-- Listen for messages from the "Esc" key press to close the tablet
 RegisterNUICallback('closeTablet', function(_, cb)
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'closeTablet' })
     cb('ok')
     local playerPed = PlayerPedId()
     ClearPedTasks(playerPed)
+    for _, prop in ipairs(GetGamePool('CObject')) do
+        if IsEntityAttachedToEntity(prop, playerPed) then
+            DeleteEntity(prop)
+        end
+    end
 end)
