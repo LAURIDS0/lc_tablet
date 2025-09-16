@@ -22,4 +22,25 @@ Config.Apps = {
         item = "lc_browser_usb",
         export = "lc_browser:client:openBrowserApp"
     },
+    {
+        id = "police",
+        name = "Police",
+        icon = "images/police.png",
+        item = "lc_police_usb",
+        export = "lc_police:client:openPoliceApp"
+    },
+    {
+        id = "ambulance",
+        name = "Ambulance",
+        icon = "images/ems.png",
+        item = "lc_ambulance_usb",
+        export = "lc_ambulance:client:openAmbulanceApp"
+    },
+    {
+        id = "boosting",
+        name = "Boosting",
+        icon = "images/boosting.png",
+        item = "lc_boosting_usb",
+        export = "lc_boosting:client:openBoostingApp"
+    },
 }

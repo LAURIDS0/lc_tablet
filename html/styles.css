@@ -5,6 +5,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: linear-gradient(45deg, crimson, rgb(23, 172, 231));
+    background-image: url('images/tablet_baggrund.png');
+    background-size: cover;
+    background-position: center;
     color: black;
     border: 25px solid #131313;
     width: 85%;
@@ -14,30 +17,178 @@
     align-items: center;
     justify-content: center;
     font-size: 1rem; /* reduced so app labels don't scale too large */
+    /* New: keep top bar clipped to tablet rounding and use system font for mac-like look */
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* Mac-like top bar */
 #topBar {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 5%; /* bigger so contents fit */
-    color: rgb(0, 0, 0);
-    background-color: rgba(62, 62, 62, 0.7);
+    height: 44px; /* fixed, mac menu height */
+    color: #111;
+    background: rgba(255,255,255,0.75); /* light translucent */
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 20px;
+    padding: 0 12px;
+    gap: 8px;
     box-sizing: border-box;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12); /* soft shadow under bar */
+    border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
+/* Top bar groups: left (logo) and right (time + status) */
+#leftGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+}
+
+#logo {
+    height: 20px; /* mac-like small logo */
+    width: auto;
+    display: block;
+    margin-left: 6px;
+    -webkit-user-drag: none;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+#rightGroup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* time & date stack */
+#timeDate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    min-width: 80px;
+    margin-right: 6px;
+}
+
+#timeDate #time {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+#timeDate #date {
+    font-size: 0.68rem;
+    font-weight: 400;
+    margin-top: 1px;
+}
+
+/* Status icons container */
+#statusIcons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Unified status icon appearance */
+.statusIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    color: rgba(0,0,0,0.65);
+    transition: color 160ms ease, transform 160ms ease, opacity 160ms ease;
+    opacity: 0.98;
+    cursor: default;
+}
+.statusIcon path {
+    stroke: currentColor;
+    fill: none;
+}
+.statusIcon:hover,
+.statusIcon:focus {
+    color: rgba(0,0,0,0.95);
+    transform: translateY(-1px);
+    outline: none;
+}
+.statusIcon[aria-hidden="false"] {
+    /* visible state if aria-hidden toggled */
+    opacity: 1;
+}
+
+/* Battery modern SVG styling */
 #batteryLevel {
-    font-size: 0.9rem;
-    background: green;
+    --level: 1;
+    --fill-color: #27ae60; /* green */
+    --low-color: #ff6b4a; /* orange-red */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 2px 6px;
-    border: #131313 solid 1px;
-    border-radius: 5px;
+    min-width: 56px;
+    height: 24px;
+    box-sizing: border-box;
+    color: rgba(0,0,0,0.78);
+    background: rgba(255,255,255,0.55);
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* SVG scales to available size */
+#batteryLevel .batteryIcon {
+    display: block;
+    width: 36px;
+    height: 18px;
+    color: var(--fill-color);
+}
+
+/* The fill rect will be clipped by a wrapper via overflow hidden technique; we instead transform it horizontally by setting its transform-origin to left */
+#batteryLevel .battery-fill {
+    transform-origin: left center;
+    transform: scaleX(var(--level));
+    transition: transform 420ms cubic-bezier(.2,.9,.3,1), fill 280ms ease;
+    fill: currentColor;
+}
+#batteryLevel .battery-body, #batteryLevel .battery-nub {
+    stroke: rgba(0,0,0,0.18);
+    fill: none;
+}
+#batteryLevel .battery-nub { fill: rgba(0,0,0,0.18); }
+
+#batteryLevel .batteryText {
+    font-weight: 700;
+    font-size: 0.83rem;
+    color: rgba(0,0,0,0.76);
+}
+
+#batteryLevel[data-low="true"] {
+    --fill-color: var(--low-color);
+    color: #6b1207;
+}
+
+#batteryLevel[data-charging="true"] {
+    /* charging uses a blue color and a bolt overlay */
+    --fill-color: #2fa8ff;
+}
+
+/* charging bolt overlay */
+#batteryLevel[data-charging="true"] .batteryIcon::after {
+    content: "";
+}
+
+/* small adjustments for responsive sizes */
+@media (max-width:720px) {
+    #batteryLevel { min-width: 48px; height: 20px; padding: 2px 6px; }
+    #batteryLevel .batteryIcon { width: 30px; height: 16px; }
+    #batteryLevel .batteryText { font-size: 0.72rem; }
 }
 
 #appGrid {
@@ -56,18 +207,45 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    color: black;
+    font-size: 1rem;
+    color: white;
     user-select: none;
     width: 100%;
     height: 100%;
 }
 
-#buttomButton {
-    position: absolute;
-    bottom: 0.5%;
-    width: 20%;
-    height: 2%;
-    background: #3e3e3e;
-    border-radius: 9px;
+.appIcon img {
+    border-radius: 12px; /* use 50% for fully circular images */
+    width: 56px !important;         /* keep consistent with inline sizes or remove inline sizes in script.js */
+    height: 56px !important;
+    object-fit: cover;   /* ensures the image fills the box while maintaining aspect ratio */
+    overflow: hidden;
+    border: 2px solid rgba(0,0,0,0.08);
+}
+
+/* Responsive: reduce top bar density on narrow tablet widths */
+@media (max-width: 720px) {
+    #topBar { height: 40px; padding: 0 10px; }
+    #logo { height: 18px; }
+    .statusIcon { width: 16px; height: 16px; }
+    #timeDate #time { font-size: 0.9rem; }
+    #timeDate #date { font-size: 0.64rem; display: none; }
+    #batteryLevel { padding: 3px 6px; min-width: 46px; }
+}
+
+/* Accessibility: focus and hover affordances for status icons */
+.statusIcon, #batteryLevel {
+    transition: color 140ms ease, opacity 140ms ease, transform 140ms ease;
+}
+.statusIcon:focus, .statusIcon:hover { transform: translateY(-1px); }
+
+/* Dark fallback for environments that force dark rendering */
+@media (prefers-color-scheme: dark) {
+    #topBar {
+        background: rgba(25,25,25,0.38);
+        color: rgba(255,255,255,0.92);
+        border-bottom-color: rgba(255,255,255,0.03);
+    }
+    .statusIcon { color: rgba(255,255,255,0.7); }
+    #date { color: rgba(255,255,255,0.42); }
 }

@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tablet Site</title>
+    <!-- Font Awesome CDN for icon fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
     <div id="tabletBox">
         <div id="topBar">
-            <div id="time"></div>
-            <div id="batteryLevel"></div>
+            <div id="leftGroup">
+                <img id="logo" src="images/logo.png" alt="logo">
+            </div>
+            <div id="rightGroup">
+                <div id="timeDate">
+                    <span id="time"></span>
+                    <span id="date"></span>
+                </div>
+                <div id="statusIcons">
+                    <!-- WiFi icon (Font Awesome) -->
+                    <i class="fa-solid fa-wifi statusIcon" id="wifiIcon" aria-hidden="true" title="Wi‑Fi"></i>
+                    <!-- Bluetooth icon (Font Awesome) -->
+                    <i class="fa-brands fa-bluetooth-b statusIcon" id="bluetoothIcon" aria-hidden="true" title="Bluetooth"></i>
+                    <div id="batteryLevel" role="status" aria-label="Battery level">
+                        <svg class="batteryIcon" viewBox="0 0 52 28" width="34" height="18" aria-hidden="true" focusable="false">
+                            <rect class="battery-body" x="1" y="4" width="42" height="20" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <rect class="battery-fill" x="3" y="6" width="38" height="16" rx="4" ry="4" fill="currentColor" />
+                            <rect class="battery-nub" x="45" y="9" width="4" height="10" rx="1" ry="1" fill="currentColor" />
+                        </svg>
+                        <span class="batteryText">100%</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="appGrid">
             <!-- App icons will be generated dynamically by script.js -->
-        <!-- <button id="buttomButton"></button> -->
     </div>
 </body>
 </html>

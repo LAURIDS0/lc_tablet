@@ -1,51 +1,72 @@
-// // Hardcoded app config for website preview
-// const hardcodedApps = [
-//     {
-//         id: "maps",
-//         name: "Maps",
-//         icon: "images/maps.png",
-//         item: "lc_map_usb",
-//         export: "lc_map:client:openMapApp"
-//     },
-//     {
-//         id: "racing",
-//         name: "Racing",
-//         icon: "images/race.png",
-//         item: "lc_raceing_usb",
-//         export: "lc_raceing:client:openRaceApp"
-//     },
-//     {
-//         id: "browser",
-//         name: "Browser",
-//         icon: "images/browser.png",
-//         item: "lc_browser_usb",
-//         export: "lc_browser:client:openBrowserApp"
-//     }
-// ];
-// // Function to render apps from a given array
-// function renderApps(apps) {
-//     const appGrid = document.getElementById('appGrid');
-//     appGrid.innerHTML = '';
-//     if (apps && Array.isArray(apps)) {
-//         apps.forEach((app, idx) => {
-//             const div = document.createElement('div');
-//             div.className = 'appIcon';
-//             div.id = 'app_' + app.id;
-//             div.innerHTML = `<img src='${app.icon}' style='height:60px;width:60px;'><br>${app.name}`;
-//             div.onclick = function() {
-//                 alert(`App clicked: ${app.name}`); // For website preview
-//             };
-//             appGrid.appendChild(div);
-//         });
-//     }
-// }
-// // If running as a website, show the tablet and render hardcoded apps
-// if (window.location.protocol === 'file:' || window.location.hostname !== 'nui') {
-//     document.getElementById('tabletBox').style.display = 'flex';
-//     renderApps(hardcodedApps);
-// }
+// Hardcoded app config for website preview
+const hardcodedApps = [
+    {
+        id: "maps",
+        name: "Maps",
+        icon: "images/maps.png",
+        item: "lc_map_usb",
+        export: "lc_map:client:openMapApp"
+    },
+    {
+        id: "racing",
+        name: "Racing",
+        icon: "images/race.png",
+        item: "lc_raceing_usb",
+        export: "lc_raceing:client:openRaceApp"
+    },
+    {
+        id: "browser",
+        name: "Browser",
+        icon: "images/browser.png",
+        item: "lc_browser_usb",
+        export: "lc_browser:client:openBrowserApp"
+    },
+    {
+        id: "police",
+        name: "Police",
+        icon: "images/police.png",
+        item: "lc_police_usb",
+        export: "lc_police:client:openPoliceApp"
+    },
+    {
+        id: "ambulance",
+        name: "Ambulance",
+        icon: "images/ems.png",
+        item: "lc_ambulance_usb",
+        export:"lc_ambulance:client:openAmbulanceApp"
+    },
+    {
+        id: "boosting",
+        name: "Boosting",
+        icon: "images/boosting.png",
+        item: "lc_boosting_usb",
+        export: "lc_boosting:client:openBoostingApp"
+    },
+];
+// Function to render apps from a given array
+function renderApps(apps) {
+    const appGrid = document.getElementById('appGrid');
+    appGrid.innerHTML = '';
+    if (apps && Array.isArray(apps)) {
+        apps.forEach((app, idx) => {
+            const div = document.createElement('div');
+            div.className = 'appIcon';
+            div.id = 'app_' + app.id;
+            div.innerHTML = `<img src='${app.icon}' style='height:60px;width:60px;'><br>${app.name}`;
+            div.onclick = function() {
+                alert(`App clicked: ${app.name}`); // For website preview
+            };
+            appGrid.appendChild(div);
+        });
+    }
+}
+// If running as a website, show the tablet and render hardcoded apps
+if (window.location.protocol === 'file:' || window.location.hostname !== 'nui') {
+    document.getElementById('tabletBox').style.display = 'flex';
+    renderApps(hardcodedApps);
+}
 
-document.getElementById('tabletBox').style.display = 'none'; // Initially hide the tablet
+// document.getElementById('tabletBox').style.display = 'none'; // Initially hide the tablet
 
 
 // Listen for messages from the Lua script to open the tablet
@@ -78,20 +99,79 @@ window.addEventListener('message', function(event) {
 
 // Live clock: updates #time every second
 function updateTime() {
-    const timeEl = document.getElementById('time');
-    if (!timeEl) return;
     const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const seconds = now.getSeconds().toString().padStart(2, '0');
-    timeEl.textContent = `${hours}:${minutes}:${seconds}`;
-}
-// start the interval so the clock runs while the page is loaded
-updateTime();
-setInterval(updateTime, 1000);
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const timeStr = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
+    const timeEl = document.getElementById('time');
+    if (timeEl) timeEl.textContent = timeStr;
 
-// Set battery level (for demo purposes, this is static)
-document.getElementById('batteryLevel').textContent = Math.floor(Math.random() * 101) + '%';
+    // Date formatting: e.g. Tue 14 Oct or localized short form
+    const dateEl = document.getElementById('date');
+    if (dateEl) {
+        const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+        dateEl.textContent = now.toLocaleDateString(undefined, opts);
+    }
+}
+
+// Setup battery level display; tries to use the Battery Status API when available, otherwise falls back to a demo/random value
+function initBatteryIndicator() {
+    const batteryEl = document.getElementById('batteryLevel');
+    if (!batteryEl) return;
+
+    function applyBatteryLevel(percent, charging = false) {
+        // percent: 0..100
+        const level = Math.max(0, Math.min(100, Math.round(percent))) / 100;
+        batteryEl.style.setProperty('--level', level);
+        // update only the percent text node (don't clobber the SVG)
+        const textEl = batteryEl.querySelector('.batteryText');
+        if (textEl) textEl.textContent = `${Math.round(percent)}%`;
+        if (percent <= 18) {
+            batteryEl.setAttribute('data-low', 'true');
+        } else {
+            batteryEl.removeAttribute('data-low');
+        }
+        if (charging) {
+            batteryEl.setAttribute('data-charging', 'true');
+        } else {
+            batteryEl.removeAttribute('data-charging');
+        }
+    }
+
+    // Try the Battery Status API
+    if (navigator.getBattery) {
+        navigator.getBattery().then(function(batt) {
+            function updateFromBattery() {
+                const pct = batt.level * 100;
+                applyBatteryLevel(pct, batt.charging);
+            }
+            updateFromBattery();
+            batt.addEventListener('levelchange', updateFromBattery);
+            batt.addEventListener('chargingchange', updateFromBattery);
+        }).catch(function() {
+            // fallback to demo
+            applyBatteryLevel(Math.round(20 + Math.random() * 80));
+        });
+    } else {
+        // No Battery API — use server / NUI message or demo value
+        // If running in an environment where the host can message battery level, listen for a custom event 'setBatteryLevel'
+        window.addEventListener('setBatteryLevel', function(e) {
+            const pct = e.detail && typeof e.detail.level === 'number' ? e.detail.level : null;
+            const charging = e.detail && typeof e.detail.charging === 'boolean' ? e.detail.charging : false;
+            if (pct !== null) applyBatteryLevel(pct, charging);
+        });
+
+        // As a fallback, set a demo value. Remove or replace in production.
+        applyBatteryLevel(Math.round(22 + Math.random() * 74));
+    }
+}
+
+// Initialize on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    updateTime();
+    initBatteryIndicator();
+    setInterval(updateTime, 1000);
+});
 
 // Close tablet on Escape key press
 window.addEventListener('keydown', function(e) {
