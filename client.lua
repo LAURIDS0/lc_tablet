@@ -1,6 +1,6 @@
 RegisterNetEvent('lc_tablet:client:openSIM')
 AddEventHandler('lc_tablet:client:openSIM', function()
-    exports.ox_inventory:displayMetadata({ tabletId = 'TabletID'})
+    exports.ox_inventory:displayMetadata({tabletId = 'TabletID'})
     local items = exports.ox_inventory:Search('slots', 'lc_tablet')
     if items and #items > 0 then
         exports.ox_inventory:closeInventory()
@@ -14,6 +14,7 @@ AddEventHandler('lc_tablet:client:openSIM', function()
         })
     end
 end)
+
 RegisterNetEvent('lc_tablet:client:openTabletStash')
 AddEventHandler('lc_tablet:client:openTabletStash', function(stashId, owner)
     exports.ox_inventory:openInventory('stash', {id=stashId, owner=owner})
@@ -62,6 +63,64 @@ AddEventHandler('lc_tablet:client:receiveUSBApps', function(availableApps)
     Wait(50)
     local tablet = CreateObject(GetHashKey("prop_cs_tablet"), table.unpack(GetEntityCoords(playerPed)), true, true, false)
     AttachEntityToEntity(tablet, playerPed, GetPedBoneIndex(playerPed, 60309), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+end)
+
+local function isInOpenInTablet(exportValue)
+    for _, v in ipairs(Config.OpenInTablet) do
+        if exportValue == v then
+            return true
+        end
+    end
+    return false
+end
+
+-- NUI callback for app usage, print export value
+RegisterNUICallback('useApp', function(data, cb)
+    cb({ export = data and data.app and data.app.export })
+    if isInOpenInTablet(data.app.export) then
+        local exportFunction = data and data.app and data.app.export
+        if exportFunction then
+            local func, err = load("return " .. exportFunction)
+            if func then
+                local success, result = pcall(func)
+                if not success then
+                    print('Error calling export function:', result)
+                end
+            else
+                lib.notify({
+                    title = 'Tablet',
+                    status = 'error',
+                    description = 'Failed to load export function: ' .. err
+                })
+            end
+        end
+    else
+        SetNuiFocus(false, false)
+        SendNUIMessage({ action = 'closeTablet' })
+        local playerPed = PlayerPedId()
+        ClearPedTasks(playerPed)
+        for _, prop in ipairs(GetGamePool('CObject')) do
+            if IsEntityAttachedToEntity(prop, playerPed) then
+                DeleteEntity(prop)
+            end
+        end
+        local exportFunction = data and data.app and data.app.export
+        if exportFunction then
+            local func, err = load("return " .. exportFunction)
+            if func then
+                local success, result = pcall(func)
+                if not success then
+                    print('Error calling export function:', result)
+                end
+            else
+                lib.notify({
+                    title = 'Tablet',
+                    status = 'error',
+                    description = 'Failed to load export function: ' .. err
+                })
+            end
+        end
+    end
 end)
 
 -- Listen for messages from the "Esc" key press to close the tablet
