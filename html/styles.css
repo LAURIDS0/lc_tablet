@@ -216,19 +216,12 @@
 
 .appIcon img {
     border-radius: 12px; /* use 50% for fully circular images */
-<<<<<<< HEAD
     background: rgba(76, 76, 76, 0.5);
-=======
->>>>>>> a2c5dc6b1f8db2b097c4584d8f3a35496054fb5a
     width: 56px !important;         /* keep consistent with inline sizes or remove inline sizes in script.js */
     height: 56px !important;
     object-fit: cover;   /* ensures the image fills the box while maintaining aspect ratio */
     overflow: hidden;
-<<<<<<< HEAD
     border: 5px solid rgba(0,0,0,0.8);
-=======
-    border: 2px solid rgba(0,0,0,0.08);
->>>>>>> a2c5dc6b1f8db2b097c4584d8f3a35496054fb5a
 }
 
 /* Responsive: reduce top bar density on narrow tablet widths */
