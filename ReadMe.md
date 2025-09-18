@@ -11,15 +11,9 @@ A simple tablet/USB tray resource for FiveM that integrates with ox_inventory, o
 
 ## Requirements
 
-- FiveM (server)
-- ox_inventory (inventory & stash)
-- oxmysql (MySQL library)
-- ox_lib (optional, used for some UI helpers/notifications)
-
-Make sure the following resources are installed and started on your server:
 - ox_inventory
 - oxmysql
-- ox_lib (optional)
+- ox_lib
 
 ## Installation
 
@@ -55,19 +49,52 @@ Example app entry (already in `config.lua`):
 
 NOTE: The resource does not come bundled with the actual USB app resources (the exports). You must provide each app's resource or change the `export` strings to match the exports on your server.
 
-## Required inventory items
+## How to get the tablet.
 
-Create inventory items matching the `item` fields in `Config.Apps`. For example (ox_inventory item JSON snippet):
+The tablet need metadata to be able to work, use `ox_inventory/data/shops.lua` to setup the shop.
 
-- lc_map_usb
-- lc_raceing_usb
-- lc_browser_usb
-- lc_police_usb
-- lc_hacking_usb
-- lc_ambulance_usb
-- lc_boosting_usb
+ITStore = {
+        name = 'IT-Store',
+        blip = {
+            id = 184, colour = 68, scale = 0.8
+        }, inventory = {
+            {
+                name = 'lc_tablet',
+                price = 0,
+                count = 1,
+                metadata = {
+                    tabletId = math.random(111111, 999999),
+                }
+            },
+        }, locations = {
+            vec3(342.99, -1298.26, 32.51)
+        }, targets = {
+            { loc = vec3(343.06, -1297.85, 31.51), length = 0.6, width = 3.0, heading = 65.0, minZ = 55.0, maxZ = 56.8, distance = 3.0 }
+        }
+    },
 
-Adjust the list in `config.lua` to match your item names.
+## How to open the tablet.
+
+The tablet item is used in a very specific way, enter this in `ox_inventory/data/items.lua`to setup the item.
+
+['lc_tablet'] = {
+    label = 'Tablet',
+    weight = 190,
+    stack = false,
+    consume = 0,
+    client = {
+        event = 'lc_tablet:client:useTablet',
+    },
+    buttons = {
+        {
+            label = 'Access USB',
+            action = function()
+                TriggerEvent('lc_tablet:client:openSIM')
+            end
+        }
+    },
+},
+
 
 ## How it works / Usage
 
