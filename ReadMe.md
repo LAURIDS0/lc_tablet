@@ -38,63 +38,63 @@ Open `config.lua` to configure apps and which exports should open inside the tab
 - `Config.OpenInTablet` is a list of export strings. Any export listed here will be executed while the tablet UI remains open (useful for apps that run inside the UI). Other exports will close the tablet UI and then run.
 
 Example app entry (already in `config.lua`):
-
-{
-    id = "maps",
-    name = "Maps",
-    icon = "images/maps.png",
-    item = "lc_map_usb",
-    export = "exports['lc_usb_map']:openMapApp()"
-}
-
+```lua
+    {
+        id = "maps",
+        name = "Maps",
+        icon = "images/maps.png",
+        item = "lc_map_usb",
+        export = "exports['lc_usb_map']:openMapApp()"
+    }
+```
 NOTE: The resource does not come bundled with the actual USB app resources (the exports). You must provide each app's resource or change the `export` strings to match the exports on your server.
 
 ## How to get the tablet.
 
 The tablet need metadata to be able to work, use `ox_inventory/data/shops.lua` to setup the shop.
-
-ITStore = {
-        name = 'IT-Store',
-        blip = {
-            id = 184, colour = 68, scale = 0.8
-        }, inventory = {
-            {
-                name = 'lc_tablet',
-                price = 0,
-                count = 1,
-                metadata = {
-                    tabletId = math.random(111111, 999999),
-                }
-            },
-        }, locations = {
-            vec3(342.99, -1298.26, 32.51)
-        }, targets = {
-            { loc = vec3(343.06, -1297.85, 31.51), length = 0.6, width = 3.0, heading = 65.0, minZ = 55.0, maxZ = 56.8, distance = 3.0 }
-        }
-    },
-
+```lua
+    ITStore = {
+            name = 'IT-Store',
+            blip = {
+                id = 184, colour = 68, scale = 0.8
+            }, inventory = {
+                {
+                    name = 'lc_tablet',
+                    price = 0,
+                    count = 1,
+                    metadata = {
+                        tabletId = math.random(111111, 999999),
+                    }
+                },
+            }, locations = {
+                vec3(342.99, -1298.26, 32.51)
+            }, targets = {
+                { loc = vec3(343.06, -1297.85, 31.51), length = 0.6, width = 3.0, heading = 65.0, minZ = 55.0, maxZ = 56.8, distance = 3.0 }
+            }
+        },
+```
 ## How to open the tablet.
 
 The tablet item is used in a very specific way, enter this in `ox_inventory/data/items.lua`to setup the item.
-
-['lc_tablet'] = {
-    label = 'Tablet',
-    weight = 190,
-    stack = false,
-    consume = 0,
-    client = {
-        event = 'lc_tablet:client:useTablet',
+```lua
+    ['lc_tablet'] = {
+        label = 'Tablet',
+        weight = 190,
+        stack = false,
+        consume = 0,
+        client = {
+            event = 'lc_tablet:client:useTablet',
+        },
+        buttons = {
+            {
+                label = 'Access USB',
+                action = function()
+                    TriggerEvent('lc_tablet:client:openSIM')
+                end
+            }
+        },
     },
-    buttons = {
-        {
-            label = 'Access USB',
-            action = function()
-                TriggerEvent('lc_tablet:client:openSIM')
-            end
-        }
-    },
-},
-
+```
 
 ## How it works / Usage
 
@@ -107,7 +107,7 @@ The tablet item is used in a very specific way, enter this in `ox_inventory/data
 
 To add a new app:
 1. Add an entry to `Config.Apps` in `config.lua` with a unique `id`, `name`, `icon`, `item`, and `export`.
-2. Ensure there is an inventory item with the same name as `item` and that you can place it in the tablet stash (or give it to the player for testing).
+2. Ensure there is an inventory item with the same name as `item` and that you can place it in the tablet stash.
 3. Provide the target export in another resource (for example `exports['my_app']:open()`) or change the `export` to an event you listen to.
 4. Optionally add the export string to `Config.OpenInTablet` if the app should run inside the tablet UI.
 
@@ -124,7 +124,3 @@ Contributions and PRs are welcome. Keep changes focused and test thoroughly.
 ## License
 
 MIT License
-
----
-
-If you want the README to include code examples for creating ox_inventory items or sample exports, tell me which inventory system and item format you use and I will add examples.
