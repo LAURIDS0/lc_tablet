@@ -73,6 +73,7 @@ The tablet need metadata to be able to work, use `ox_inventory/data/shops.lua` t
             }
         },
 ```
+
 ## How to open the tablet.
 
 The tablet item is used in a very specific way, enter this in `ox_inventory/data/items.lua`to setup the item.
