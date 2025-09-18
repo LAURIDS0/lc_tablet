@@ -136,3 +136,13 @@ RegisterNUICallback('closeTablet', function(_, cb)
         end
     end
 end)
+
+
+local function fallback_export()
+    lib.notify({
+        title = 'Tablet',
+        status = 'error',
+        description = 'Pointing to a fallback export, please check the app configuration, or contact support.'
+    })
+end
+exports('fallback_export', fallback_export)
