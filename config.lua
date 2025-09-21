@@ -41,7 +41,7 @@ Config.Apps = {
         name = "Boosting",
         icon = "images/boosting.png",
         item = "lc_boosting_usb",
-        export = "exports['lc_usb_boosting']:openBoostingApp()" -- Placeholder export
+        export = "exports['lc_boosting']:openBoostingApp()" -- Placeholder export
     },
 
 
