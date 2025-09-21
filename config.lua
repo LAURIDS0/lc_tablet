@@ -73,6 +73,6 @@ Config.OpenInTablet = {
     "exports['cw-racingapp']:openRacingApp()",
     "exports['lc_usb_browser']:openBrowserApp()",
     "exports['lc_usb_dispatch']:openDispatchApp()",
-    "exports['lc_usb_boosting']:openBoostingApp()",
+    -- "exports['lc_usb_boosting']:openBoostingApp()",
     -- Add as many exports here as needed
 }
